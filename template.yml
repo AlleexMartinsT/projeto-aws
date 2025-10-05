@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Projeto AWS - Cadastro de Alunos com Lambda, SQS, SNS e API Gateway
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: python3.12
+    MemorySize: 128
+
+Resources:
+  CadastroAlunosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cadastro_alunos/
+      Handler: handler.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /cadastro
+            Method: post
+      Environment:
+        Variables:
+          SQS_QUEUE_URL: !Ref AlunosQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt AlunosQueue.QueueName
+
+  ProcessarAlunosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: processar_alunos/
+      Handler: handler.lambda_handler
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AlunosQueue.Arn
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref AlunosTopic
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt AlunosQueue.QueueName
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlunosTopic.TopicName
+
+  SalvarAlunosFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: salvar_alunos/
+      Handler: handler.lambda_handler
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref AlunosTopic
+
+  AlunosQueue:
+    Type: AWS::SQS::Queue
+
+  AlunosTopic:
+    Type: AWS::SNS::Topic
+
+Outputs:
+  ApiUrl:
+    Description: Endpoint da API Gateway
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cadastro"
