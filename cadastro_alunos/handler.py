@@ -2,7 +2,7 @@ import os
 import json
 import boto3
 
-sqs = boto3.client('sqs')
+sqs = boto3.client('sqs') # Teste
 
 def lambda_handler(event, context):
     body = json.loads(event['body'])
