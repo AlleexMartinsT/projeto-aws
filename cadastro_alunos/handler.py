@@ -1,4 +1,3 @@
-# Importa bibliotecas necessárias
 import os          # Para acessar variáveis de ambiente (como a URL da fila SQS)
 import json        # Para converter dados entre Python e JSON
 import boto3       # SDK da AWS para Python, usado para acessar serviços como SQS
@@ -7,11 +6,6 @@ import boto3       # SDK da AWS para Python, usado para acessar serviços como S
 sqs = boto3.client('sqs') 
 
 def lambda_handler(event, context):
-    """
-    Função principal da AWS Lambda.
-    Ela será chamada automaticamente quando a API Gateway receber uma requisição HTTP.
-    """
-
     # Converte o corpo (body) da requisição JSON em um dicionário Python
     body = json.loads(event['body'])
 
