@@ -5,6 +5,7 @@ on:
   workflow_dispatch:  # Permite executar manualmente o deploy pelo botão "Run workflow" no GitHub Actions
 
 
+
 jobs:
   deploy-hom:
     runs-on: ubuntu-latest  # Define que o job será executado em uma máquina Ubuntu
@@ -14,7 +15,7 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      # Configura a versão do Python que será usada no ambiente
+      # Configura a versão do python que será usada no ambiente
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
@@ -37,5 +38,3 @@ jobs:
         run: |
           # Executa o comando de deploy do stack de homologação na AWS
           sam deploy --stack-name projeto-aws-hom --capabilities CAPABILITY_IAM --resolve-s3 --no-confirm-changeset
-
-
