@@ -1,30 +1,41 @@
 name: Deploy Homologação
 
+# Define quando o workflow será executado
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Permite executar manualmente o deploy pelo botão "Run workflow" no GitHub Actions
+
 
 jobs:
   deploy-hom:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Define que o job será executado em uma máquina Ubuntu
+
     steps:
+      # Faz o checkout do código do repositório para o ambiente de execução
       - name: Checkout código
         uses: actions/checkout@v3
 
+      # Configura a versão do Python que será usada no ambiente
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.12'  # Define a versão do Python a ser usada
 
+      # Instala o AWS SAM CLI, ferramenta para empacotar e fazer deploy de aplicações serverless
       - name: Instalar SAM CLI
         run: pip install aws-sam-cli
 
+      # Executa o build do projeto SAM (prepara dependências e artefatos para o deploy)
       - name: Build SAM
         run: sam build
 
+      # Faz o deploy da aplicação no ambiente de homologação (teste)
       - name: Deploy Homologação
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_HOM }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_HOM }}
-          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_HOM }}          # Chave de acesso AWS armazenada nos GitHub Secrets
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_HOM }}  # Chave secreta AWS armazenada nos GitHub Secrets
+          AWS_DEFAULT_REGION: us-east-1  # Define a região padrão da AWS
         run: |
+          # Executa o comando de deploy do stack de homologação na AWS
           sam deploy --stack-name projeto-aws-hom --capabilities CAPABILITY_IAM --resolve-s3 --no-confirm-changeset
+
+

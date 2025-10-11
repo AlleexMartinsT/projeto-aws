@@ -1,32 +1,40 @@
 name: Deploy Dev
 
+# Define quando o workflow será executado
 on:
   push:
     branches:
-      - dev
+      - dev  # Executa automaticamente o deploy sempre que houver um push na branch "dev"
 
 jobs:
   deploy-dev:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Define que o job será executado em uma máquina Ubuntu
+
     steps:
+      # Passo 1: Faz o checkout do código do repositório
       - name: Checkout código
         uses: actions/checkout@v3
 
+      # Passo 2: Configura o ambiente Python
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.12'  # Define a versão do Python usada pelo projeto
 
+      # Passo 3: Instala o AWS SAM CLI (ferramenta para build e deploy de aplicações serverless)
       - name: Instalar SAM CLI
         run: pip install aws-sam-cli
 
+      # Passo 4: Executa o build do projeto SAM
       - name: Build SAM
         run: sam build
 
+      # Passo 5: Faz o deploy para o ambiente de desenvolvimento (Dev)
       - name: Deploy Dev
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
-          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}          # Chave de acesso AWS (armazenada nos GitHub Secrets)
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}  # Chave secreta AWS (armazenada nos GitHub Secrets)
+          AWS_DEFAULT_REGION: us-east-1  # Região padrão da AWS
         run: |
+          # Executa o comando de deploy usando o AWS SAM
           sam deploy --stack-name projeto-aws-dev --capabilities CAPABILITY_IAM --resolve-s3 --no-confirm-changeset
