@@ -1,32 +1,40 @@
 name: Deploy Produção
 
+# Define quando o workflow será executado
 on:
   push:
     branches:
-      - main
+      - main  # Executa o deploy sempre que houver um push na branch main
 
 jobs:
   deploy-main:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Define o sistema operacional usado na execução (Ubuntu)
+
     steps:
+      # Faz o checkout do repositório para o ambiente do GitHub Actions
       - name: Checkout código
         uses: actions/checkout@v3
 
+      # Configura a versão do Python que será usada
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.12'  # Define a versão do Python
 
+      # Instala o AWS SAM CLI (ferramenta usada para deploy de funções Lambda e outros recursos)
       - name: Instalar SAM CLI
         run: pip install aws-sam-cli
 
+      # Compila o projeto SAM antes do deploy
       - name: Build SAM
         run: sam build
 
+      # Realiza o deploy para o ambiente de produção
       - name: Deploy Produção
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
-          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}       # Chave de acesso AWS (armazenada nos Secrets)
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }} # Chave secreta AWS (armazenada nos Secrets)
+          AWS_DEFAULT_REGION: us-east-1  # Região padrão da AWS
         run: |
+          # Comando que executa o deploy do stack no ambiente de produção
           sam deploy --stack-name projeto-aws-prod --capabilities CAPABILITY_IAM --resolve-s3 --no-confirm-changeset
