@@ -36,5 +36,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }} # Chave secreta AWS (armazenada nos Secrets)
           AWS_DEFAULT_REGION: us-east-1  # Região padrão da AWS
         run: |
-          # Comando que executa o deploy do stack no ambiente de produção
+          # Comando que executa o deploy do stack no ambiente deprodução
           sam deploy --stack-name projeto-aws-prod --capabilities CAPABILITY_IAM --resolve-s3 --no-confirm-changeset
